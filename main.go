@@ -98,10 +98,10 @@ func getSheetData(sheetId string, sheetName string) ([]byte, interface{}, error)
 			var valNumber = getNumberVaule(valStr)
 			if valNumber != nil {
 				responseData[k], _ = valNumber.Int64()
-			}
-
-			if valStr != "" {
-				responseData[k] = v
+			} else {
+				if valStr != "" {
+					responseData[k] = v
+				}
 			}
 		}
 		dataResponse = append(dataResponse, responseData)
