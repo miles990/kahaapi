@@ -1,0 +1,28 @@
+info:
+  contact: {}
+paths:
+  /sheetData:
+    get:
+      description: do sheetData
+      parameters:
+      - description: sheet id
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: sheet name
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: get sheetdata example
+      tags:
+      - SheetData
+swagger: "2.0"

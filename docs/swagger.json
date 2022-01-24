@@ -1,0 +1,44 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/sheetData": {
+            "get": {
+                "description": "do sheetData",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SheetData"
+                ],
+                "summary": "get sheetdata example",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "sheet id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "sheet name",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
