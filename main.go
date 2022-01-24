@@ -28,19 +28,21 @@ type SheetData struct {
 	Tag                  string `json:"Tag"`
 }
 
-type SheetDataResponse struct {
-	ID                   json.Number  `json:"ID"`
-	Sp                   *json.Number `json:"SP"`
-	NameContextID        *json.Number `json:"NameContextID"`
-	DescriptionContextID *json.Number `json:"DescriptionContextID"`
-	StoryContextID       *json.Number `json:"StoryContextID"`
-	AnimationInfo        string       `json:"AnimationInfo"`
-	References           string       `json:"References"`
-	Command              string       `json:"Command"`
-	IsDrop               *json.Number `json:"IsDrop"`
-	Tag                  string       `json:"Tag"`
-	// NOEX                 string `json:"-, NOEX_技能故事(不輸出),omitempty"`
-}
+// type SheetDataResponse struct {
+// 	ID                   json.Number  `json:"ID"`
+// 	Sp                   *json.Number `json:"SP,omitempty"`
+// 	NameContextID        *json.Number `json:"NameContextID,omitempty"`
+// 	DescriptionContextID *json.Number `json:"DescriptionContextID,omitempty"`
+// 	StoryContextID       *json.Number `json:"StoryContextID,omitempty"`
+// 	AnimationInfo        string       `json:"AnimationInfo"`
+// 	References           string       `json:"References"`
+// 	Command              string       `json:"Command"`
+// 	IsDrop               *json.Number `json:"IsDrop,omitempty"`
+// 	Tag                  string       `json:"Tag"`
+// 	// NOEX                 string `json:"-, NOEX_技能故事(不輸出),omitempty"`
+// }
+
+type SheetDataResponse map[string]interface{}
 
 func getNumberVaule(data string) *json.Number {
 	_, err := strconv.Atoi(data)
@@ -82,20 +84,64 @@ func getSheetData(sheetId string, sheetName string) ([]byte, interface{}, error)
 			// fmt.Printf("%+v\n", data)
 			// fmt.Println(data.ID, data.StoryContextID)
 		}
-		var responseData = SheetDataResponse{
-			ID:                   json.Number(data.ID),
-			Sp:                   getNumberVaule(data.Sp),
-			NameContextID:        getNumberVaule(data.NameContextID),
-			DescriptionContextID: getNumberVaule(data.DescriptionContextID),
-			StoryContextID:       getNumberVaule(data.StoryContextID),
-			AnimationInfo:        data.AnimationInfo,
-			References:           data.References,
-			Command:              data.Command,
-			IsDrop:               getNumberVaule(data.IsDrop),
-			Tag:                  data.Tag,
+		// var responseData = SheetDataResponse{
+		// 	ID:                   json.Number(data.ID),
+		// 	Sp:                   getNumberVaule(data.Sp),
+		// 	NameContextID:        getNumberVaule(data.NameContextID),
+		// 	DescriptionContextID: getNumberVaule(data.DescriptionContextID),
+		// 	StoryContextID:       getNumberVaule(data.StoryContextID),
+		// 	AnimationInfo:        data.AnimationInfo,
+		// 	References:           data.References,
+		// 	Command:              data.Command,
+		// 	IsDrop:               getNumberVaule(data.IsDrop),
+		// 	Tag:                  data.Tag,
+		// }
+
+		var responseData = SheetDataResponse{}
+		responseData["ID"] = json.Number(data.ID)
+
+		var val *json.Number
+		val = getNumberVaule(data.Sp)
+		if val != nil {
+			responseData["SP"] = val
 		}
+
+		val = getNumberVaule(data.NameContextID)
+		if val != nil {
+			responseData["NameContextID"] = val
+		}
+
+		val = getNumberVaule(data.DescriptionContextID)
+		if val != nil {
+			responseData["DescriptionContextID"] = val
+		}
+
+		val = getNumberVaule(data.StoryContextID)
+		if val != nil {
+			responseData["StoryContextID"] = val
+		}
+
+		responseData["AnimationInfo"] = data.AnimationInfo
+		responseData["References"] = data.References
+		responseData["Command"] = data.Command
+
+		val = getNumberVaule(data.IsDrop)
+		if val != nil {
+			responseData["IsDrop"] = val
+		}
+
+		responseData["Tag"] = data.Tag
+
 		dataResponse = append(dataResponse, responseData)
 	}
+
+	// var response = make(map[string]interface{})
+	// for _, data := range dataResponse {
+	// 	for k,v := range data {
+	// 		fmt.Printf("%+v %+v", k, v)
+	// 	}
+
+	// }
 
 	return body, dataResponse, err
 }
