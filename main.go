@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	docs "github.com/miles990/kahaapi/docs"
@@ -15,18 +16,18 @@ import (
 
 // const json = `{"name":{"first":"Janet","last":"Prichard"},"age":47}`
 
-type SheetData struct {
-	ID                   string `json:"ID"`
-	Sp                   string `json:"SP,omitempty"`
-	NameContextID        string `json:"NameContextID,omitempty"`
-	DescriptionContextID string `json:"DescriptionContextID,omitempty"`
-	StoryContextID       string `json:"StoryContextID, omitempty"`
-	AnimationInfo        string `json:"AnimationInfo"`
-	References           string `json:"References"`
-	Command              string `json:"Command"`
-	IsDrop               string `json:"IsDrop"`
-	Tag                  string `json:"Tag"`
-}
+// type SheetData struct {
+// 	ID                   string `json:"ID"`
+// 	Sp                   string `json:"SP,omitempty"`
+// 	NameContextID        string `json:"NameContextID,omitempty"`
+// 	DescriptionContextID string `json:"DescriptionContextID,omitempty"`
+// 	StoryContextID       string `json:"StoryContextID, omitempty"`
+// 	AnimationInfo        string `json:"AnimationInfo"`
+// 	References           string `json:"References"`
+// 	Command              string `json:"Command"`
+// 	IsDrop               string `json:"IsDrop"`
+// 	Tag                  string `json:"Tag"`
+// }
 
 // type SheetDataResponse struct {
 // 	ID                   json.Number  `json:"ID"`
@@ -41,6 +42,8 @@ type SheetData struct {
 // 	Tag                  string       `json:"Tag"`
 // 	// NOEX                 string `json:"-, NOEX_技能故事(不輸出),omitempty"`
 // }
+
+type SheetData map[string]interface{}
 
 type SheetDataResponse map[string]interface{}
 
@@ -77,72 +80,32 @@ func getSheetData(sheetId string, sheetName string) ([]byte, interface{}, error)
 
 	var dataResponse []SheetDataResponse = make([]SheetDataResponse, 0)
 	for _, data := range results {
-		if data.ID == "" {
+		value, exist := data["ID"]
+		if !exist || value == "" {
 			continue
-			// responseData = append(responseData, data)
-			// skillDataMap[data.ID] = data
-			// fmt.Printf("%+v\n", data)
-			// fmt.Println(data.ID, data.StoryContextID)
 		}
-		// var responseData = SheetDataResponse{
-		// 	ID:                   json.Number(data.ID),
-		// 	Sp:                   getNumberVaule(data.Sp),
-		// 	NameContextID:        getNumberVaule(data.NameContextID),
-		// 	DescriptionContextID: getNumberVaule(data.DescriptionContextID),
-		// 	StoryContextID:       getNumberVaule(data.StoryContextID),
-		// 	AnimationInfo:        data.AnimationInfo,
-		// 	References:           data.References,
-		// 	Command:              data.Command,
-		// 	IsDrop:               getNumberVaule(data.IsDrop),
-		// 	Tag:                  data.Tag,
-		// }
 
 		var responseData = SheetDataResponse{}
-		responseData["ID"] = json.Number(data.ID)
 
-		var val *json.Number
-		val = getNumberVaule(data.Sp)
-		if val != nil {
-			responseData["SP"] = val
+		for k, v := range data {
+			// fmt.Printf("%+v %+v\n", k, v)
+
+			if strings.Contains(k, "NOEX") {
+				continue
+			}
+
+			var valStr = fmt.Sprintf("%v", v)
+			var valNumber = getNumberVaule(valStr)
+			if valNumber != nil {
+				responseData[k], _ = valNumber.Int64()
+			}
+
+			if valStr != "" {
+				responseData[k] = v
+			}
 		}
-
-		val = getNumberVaule(data.NameContextID)
-		if val != nil {
-			responseData["NameContextID"] = val
-		}
-
-		val = getNumberVaule(data.DescriptionContextID)
-		if val != nil {
-			responseData["DescriptionContextID"] = val
-		}
-
-		val = getNumberVaule(data.StoryContextID)
-		if val != nil {
-			responseData["StoryContextID"] = val
-		}
-
-		responseData["AnimationInfo"] = data.AnimationInfo
-		responseData["References"] = data.References
-		responseData["Command"] = data.Command
-
-		val = getNumberVaule(data.IsDrop)
-		if val != nil {
-			responseData["IsDrop"] = val
-		}
-
-		responseData["Tag"] = data.Tag
-
 		dataResponse = append(dataResponse, responseData)
 	}
-
-	// var response = make(map[string]interface{})
-	// for _, data := range dataResponse {
-	// 	for k,v := range data {
-	// 		fmt.Printf("%+v %+v", k, v)
-	// 	}
-
-	// }
-
 	return body, dataResponse, err
 }
 
