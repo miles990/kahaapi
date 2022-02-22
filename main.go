@@ -116,12 +116,15 @@ func getSheetData(sheetId string, sheetName string) ([]byte, interface{}, error)
 // @Tags SheetData
 // @Param id query string true "sheet id"
 // @Param name query string true "sheet name"
+// @Param pretty query string false "pretty json"
 // @Produce json
 // @Success 200 {string} Helloworld
 // @Router /sheetData [get]
 func GetSheetData(c *gin.Context) {
 	sheetId := c.Query("id")
 	sheetName := c.Query("name")
+	pretty := c.Query("pretty")
+
 	_, skillDatas, err := getSheetData(sheetId, sheetName)
 	if err != nil {
 		c.JSON(500, gin.H{
@@ -129,8 +132,12 @@ func GetSheetData(c *gin.Context) {
 		})
 		return
 	}
+	if pretty == "true" || pretty == "1" {
+		c.IndentedJSON(200, skillDatas)
+	} else {
+		c.JSON(200, skillDatas)
+	}
 
-	c.JSON(200, skillDatas)
 }
 
 func main() {
